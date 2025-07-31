@@ -11,3 +11,4 @@ REPORT_GAS=true npx hardhat test
 npx hardhat node
 npx hardhat ignition deploy ./ignition/modules/EmployeeManagementSystem.ts
 ```
+// contract address : 0x29735F53c5049a3CEe78166869159965974c8C61
