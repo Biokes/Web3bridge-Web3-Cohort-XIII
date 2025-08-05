@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.28;
+import "./errorLibrary.sol";
 
 contract EmployeeManagementSystem {
-    enum Position {MEDIA_TEAM,MENTOR,MANAGER,SOCIAL_MEDIA_TEAM,TECHNICIAN_SUPERVISOR,KITCHEN_STAFF }
+    enum Position {MEDIA_TEAM, MENTOR, MANAGER, SOCIAL_MEDIA_TEAM, TECHNICIAN_SUPERVISOR, KITCHEN_STAFF }
     struct Employee{
         string name;
         Position role;
@@ -11,11 +12,14 @@ contract EmployeeManagementSystem {
     }
     mapping (address=> Employee) private employees;
     Employee[] private allEmployees;
-    error INVALID_DATA_PASSED();
     function addEmployee(address employeeAddress ,string memory name, Position role)external {
+        require(bytes(name).length>0 , Error.INVALID_DATA_PASSED());
         Employee memory employee = Employee(name, role, true, employeeAddress);
         employees[employeeAddress]= employee;
         allEmployees.push(employee);
+    }
+    function getAllEmployees()external view returns(Employee[] memory){
+        return allEmployees;
     }
 
     function updateEmployees(address employeeAddress, string memory name) external {
@@ -26,8 +30,9 @@ contract EmployeeManagementSystem {
                 return;
             }
         }
-        revert INVALID_DATA_PASSED();
+        revert Error.INVALID_DATA_PASSED();
     }
+
     function toggleEmploymentStatus(address employeeAddress) external {
         for(uint counter; counter< allEmployees.length; counter++){
             if(allEmployees[counter].employeeAddress== employeeAddress){
@@ -37,8 +42,9 @@ contract EmployeeManagementSystem {
                 return;
             }
         }
-        revert INVALID_DATA_PASSED();
+        revert Error.INVALID_DATA_PASSED();
     }
+
 
     function updateEmployeeRole(address employeeAddress, Position role) external {
         for(uint counter; counter< allEmployees.length; counter++){
@@ -46,10 +52,11 @@ contract EmployeeManagementSystem {
                 allEmployees[counter].role= role;
                 employees[employeeAddress].role=role;
                 return;
+}
             }
-        }
-        revert INVALID_DATA_PASSED();
+        revert Error.INVALID_DATA_PASSED();
     }
+
     function updateEmployeeData(address employeeAddress , Position role, string memory name)external{
         for(uint counter; counter< allEmployees.length; counter++){
             if(allEmployees[counter].employeeAddress == employeeAddress){
@@ -58,22 +65,19 @@ contract EmployeeManagementSystem {
                 employees[employeeAddress].role=role;
                 employees[employeeAddress].name=name;
                 return;
+}
             }
-        }
-        revert INVALID_DATA_PASSED();
+        revert Error.INVALID_DATA_PASSED();
     }
 
     function canAccessGarage(address employeeAddress)external view returns (bool){
         for(uint counter; counter< allEmployees.length; counter++){
             if(allEmployees[counter].employeeAddress == employeeAddress){
                 return allEmployees[counter].isEmployed &&
-                    (allEmployees[counter].role == Position.MEDIA_TEAM || allEmployees[counter].role == Position.MENTOR || allEmployees[counter].role == Position.MANAGER);
+                (allEmployees[counter].role == Position.MEDIA_TEAM || allEmployees[counter].role == Position.MENTOR || allEmployees[counter].role == Position.MANAGER);
+}
             }
-        }
         return false;
-    }
-    function getAllEmployees()external view returns(Employee[] memory){
-        return allEmployees;
     }
 
     function getEmployeeByAddress(address employeeAddress) external view returns(Employee memory) {
@@ -82,6 +86,6 @@ contract EmployeeManagementSystem {
                 return allEmployees[counter];
             }
         }
-        revert INVALID_DATA_PASSED();
+        revert Error.INVALID_DATA_PASSED();
     }
 }
